@@ -19,7 +19,7 @@ np.random.seed(1111)
 def load_data():    
     #loads the data from a given location as a dictionary
     loaded_data={}
-    file_list=['IA1_train','PA1_test1']
+    file_list=['PA1_train','PA1_test1']
     keys = ['train', 'test']
     for i, file in enumerate(file_list):
         d=pd.read_csv(file+".csv")
@@ -40,9 +40,10 @@ def preprocess_data(df, normalize=True, sqft_living15=False):
     for key in df.keys():
 
     # 1. Remove ID column and sqft_living15 if True
-        #df[key].drop("id",axis=1,inplace=True)
+        if(key == 'train'):
+            df[key].drop("id",axis=1,inplace=True)
         if sqft_living15:
-            df[key].drop("sqft_living15",axis=1,inplace=True)
+            df[key].drop("sqft_living15","sqft_lot15","sqft_lot","zipcode","bedroom" >6, axis=1,inplace=True)
     # 2. Split date into date, month, year
         df[key]['date']=pd.to_datetime(df[key]['date'])
         df[key]['year']=df[key]['date'].dt.year
@@ -90,7 +91,7 @@ def modify_features(data):
 # Trains a linear model on the provided data and labels, using the supplied learning rate.
 # weights should store the per-feature weights of the learned linear regression.
 # losses should store the sequence of MSE losses for each epoch of training, which you will then plot.
-'''
+
 def gd_train(data, labels, lr, stopConvVal=10e-6, numDivergentVals=10):
     # Your code here:
     # 1. Initialise random w vector of the size of number of columns (cols) in features dataframe
@@ -150,7 +151,7 @@ def gd_train(data, labels, lr, stopConvVal=10e-6, numDivergentVals=10):
     
 
     return weights, losses, completion_marker
-'''
+
 # Invoke the above functions to implement the required functionality for each part of the assignment.
 
 # Part 0  : Data preprocessing.
@@ -160,7 +161,7 @@ def gd_train(data, labels, lr, stopConvVal=10e-6, numDivergentVals=10):
 
 # Part 1 . Implement batch gradient descent and experiment with different learning rates.
 # Your code here:
-'''
+
 def grad_desc(features, y, title, lrs, stopEarlyConv, stopEarlyDiv):
     losses_matrix = []
     lr_plots = []
@@ -179,10 +180,10 @@ def grad_desc(features, y, title, lrs, stopEarlyConv, stopEarlyDiv):
         completion_markers.append(completion_marker)
 
     return weights_array, completion_markers
-'''
+    
 def validation(features, weights,output_df):
 
-     Y_hat = np.sum(weight * features, axis=1)
+     Y_hat = np.sum(weights * features, axis=1)
      #sum_loss = np.sum(np.square(Y_hat - y))
      #loss = sum_loss/features.shape[0]
      output_df['price'] = Y_hat
@@ -193,7 +194,7 @@ def validation(features, weights,output_df):
        
 # Part 1 batch gradient descent on normalized data 
 # Your code here:
-if False:
+if True:
     print("------------------------------------------------------------------------------------------------------------------")
     print("------------------------------------------- Processing Normalized Data -------------------------------------------")
     print("------------------------------------------------------------------------------------------------------------------")
@@ -205,14 +206,14 @@ if False:
     norm_train_features = data['train'][norm_feature_names].to_numpy()
     norm_y = data['train']['price'].to_numpy()
     #print("-------------------------------------------- Running Gradient Descent --------------------------------------------")
-    #norm_weights_array, norm_completion_markers = grad_desc(norm_train_features, norm_y, 'Normalised', norm_learning_rates, 10e-6, 10)
+    norm_weights_array, norm_completion_markers = grad_desc(norm_train_features, norm_y, 'Normalised', norm_learning_rates, 10e-6, 10)
     print("----------------------------------------------- Running Validation -----------------------------------------------")
     norm_test_features = data['test'][norm_feature_names].to_numpy()
     #norm_test_y = data['test']['price'].to_numpy()
-    norm_weights_array = [-0.2842115, 0.34837914, 0.87006086, 0.05846561, 0.02292471, 3.1335569,
-                             0.4770081, 0.19157651, 1.11449918, 0.66323201, 0.10116509, -0.06705246,
-                             -0.26514001, 0.83395034, -0.30246532, 0.13769728, -0.09955753, 0.16014805,
-                             0.05612991, -0.04974887, 5.34055516, 0.73579381]
+    #norm_weights_array = np.array([-0.2842115, 0.34837914, 0.87006086, 0.05846561, 0.02292471, 3.1335569,
+     #                        0.4770081, 0.19157651, 1.11449918, 0.66323201, 0.10116509, -0.06705246,
+      #                       -0.26514001, 0.83395034, -0.30246532, 0.13769728, -0.09955753, 0.16014805,
+       #                      0.05612991, -0.04974887, 5.34055516, 0.73579381])
     output_df = data['test'][['id']]
 
     output_df = validation(norm_test_features, norm_weights_array,output_df)
@@ -220,3 +221,4 @@ if False:
     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Processed Normalized Data xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n\n")
 
 
+    #/nfs/stak/users/sathea/IA_Solo_Assignment
