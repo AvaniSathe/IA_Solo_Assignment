@@ -19,7 +19,7 @@ np.random.seed(1111)
 def load_data():    
     #loads the data from a given location as a dictionary
     loaded_data={}
-    file_list=['PA1_train','PA1_test1']
+    file_list=['PA1_train1','PA1_test1']
     keys = ['train', 'test']
     for i, file in enumerate(file_list):
         d=pd.read_csv(file+".csv")
@@ -42,8 +42,13 @@ def preprocess_data(df, normalize=True, sqft_living15=False):
     # 1. Remove ID column and sqft_living15 if True
         if(key == 'train'):
             df[key].drop("id",axis=1,inplace=True)
+            df[key].drop("sqft_living15","sqft_lot15","sqft_lot", axis=1,inplace=True)
+            norm_zipcode = df[key].get_dummies(df[key]['zipcode'])
+            df = pd.concat([df,norm_zipcode],axis = 1)
+            df[key].drop("zipcode",axis=1,inplace=True)
         if sqft_living15:
-            df[key].drop("sqft_living15","sqft_lot15","sqft_lot","zipcode","bedroom" >6, axis=1,inplace=True)
+            df[key].drop("sqft_living15","sqft_lot15","sqft_lot", axis=1,inplace=True)
+
     # 2. Split date into date, month, year
         df[key]['date']=pd.to_datetime(df[key]['date'])
         df[key]['year']=df[key]['date'].dt.year
